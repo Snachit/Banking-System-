@@ -1,224 +1,229 @@
 import random
 import csv
 
-class BankAccount:
-    def __init__(self, client_id, balance=0):
-        self.client_id = client_id
-        self.account_number = int(str(client_id) + str(random.randint(0, 100)))
-        self.balance = balance
+class CompteBancaire:
+    def __init__(self, id_client, solde=0):
+        self.id_client = id_client
+        self.numero_compte = int(str(id_client) + str(random.randint(0, 100)))
+        self.solde = solde
 
-    def deposit(self, amount):
-        self.balance += amount
-        print(f"Deposited {amount} units. New balance: {self.balance}")
+    def deposer(self, montant):
+        self.solde += montant
+        print(f"Dépôt de {montant} Dh. Nouveau solde : {self.solde} Dh")
 
-    def withdraw(self, amount):
-        if amount > self.balance:
-            print("Insufficient funds!")
+    def retirer(self, montant):
+        if montant > self.solde:
+            print("Fonds insuffisants !")
         else:
-            self.balance -= amount
-            print(f"Withdrew {amount} units. New balance: {self.balance}")
+            self.solde -= montant
+            print(f"Retrait de {montant} Dh. Nouveau solde : {self.solde} Dh")
 
-    def display_info(self):
-        print(f"Client ID: {self.client_id}, Account Number: {self.account_number}, Balance: {self.balance}")
+    def afficher_info(self):
+        print(f"ID Client : {self.id_client}, Numéro de Compte : {self.numero_compte}, Solde : {self.solde}")
 
-class Bank:
+class Banque:
     def __init__(self):
-        self.accounts = {}
-        self.client_secret = {}
-        self.client_account = {}
+        self.comptes = {}
+        self.secret_client = {}
+        self.client_compte = {}
 
-    def add_account(self, client_id):
-        if client_id not in self.accounts:
-            new_account = BankAccount(client_id)
-            self.accounts[client_id] = new_account
-            secret = input(f"Set a secret code for client {client_id}: ")
-            self.client_secret[client_id] = secret
-            self.client_account[client_id] = new_account.account_number
-            print(f"Account created successfully for client {client_id}.")
+    def ajouter_compte(self, id_client):
+        if id_client not in self.comptes:
+            nouveau_compte = CompteBancaire(id_client)
+            self.comptes[id_client] = nouveau_compte
+            secret = input(f"Définir un code secret pour le client {id_client} : ")
+            self.secret_client[id_client] = secret
+            self.client_compte[id_client] = nouveau_compte.numero_compte
+            print(f"Compte créé avec succès pour le client {id_client}.")
         else:
-            print(f"Account already exists for client {client_id}.")
+            print(f"Le compte existe déjà pour le client {id_client}.")
 
-    def remove_account(self, client_id):
-        if client_id in self.accounts:
-            del self.accounts[client_id]
-            del self.client_secret[client_id]
-            del self.client_account[client_id]
-            print(f"Account removed successfully for client {client_id}.")
+    def supprimer_compte(self, id_client):
+        if id_client in self.comptes:
+            del self.comptes[id_client]
+            del self.secret_client[id_client]
+            del self.client_compte[id_client]
+            print(f"Compte supprimé avec succès pour le client {id_client}.")
         else:
-            print(f"No account found for client {client_id}.")
+            print(f"Aucun compte trouvé pour le client {id_client}.")
 
-    def display_accounts(self):
-        for account in self.accounts.values():
-            account.display_info()
+    def afficher_comptes(self):
+        for compte in self.comptes.values():
+            compte.afficher_info()
 
-    def client_menu(self, client_id):
+    def menu_client(self, id_client):
         while True:
-            print("\nClient Menu:")
-            print("1. Modify Password")
-            print("2. Display Balance")
-            print("3. Deposit Money")
-            print("4. Withdraw Money")
-            print("5. Quit")
+            print("\nMenu Client :")
+            print("1. Modifier le mot de passe")
+            print("2. Afficher le solde")
+            print("3. Déposer de l'argent")
+            print("4. Retirer de l'argent")
+            print("5. Quitter")
 
-            choice = input("Enter your choice: ")
+            choix = input("Entrez votre choix : ")
 
-            if choice == '1':
-                new_password = input("Enter a new password: ")
-                self.client_secret[client_id] = new_password
-                print("Password modified successfully.")
+            if choix == '1':
+                old_mdp = input("Saisir l'ancien mot de passe : ")
+                while old_mdp != self.secret_client[id_client]:
+                    print("Ancien mot de passe invalide!")
+                    old_mdp = input("Saisir l'ancien mot de passe : ")
+                nouveau_mot_de_passe = input("Entrez un nouveau mot de passe : ")
+                self.secret_client[id_client] = nouveau_mot_de_passe
+                print("Mot de passe modifié avec succès.")
 
-            elif choice == '2':
-                account_number = self.client_account[client_id]
-                print(f"Your balance is: {self.accounts[client_id].balance}")
+            elif choix == '2':
+                numero_compte = self.client_compte[id_client]
+                print(f"Votre solde est : {self.comptes[id_client].solde} Dh")
 
-            elif choice == '3':
-                amount = float(input("Enter the amount to deposit: "))
-                self.accounts[client_id].deposit(amount)
+            elif choix == '3':
+                montant = float(input("Entrez le montant à déposer : "))
+                self.comptes[id_client].deposer(montant)
 
-            elif choice == '4':
-                amount = float(input("Enter the amount to withdraw: "))
-                self.accounts[client_id].withdraw(amount)
+            elif choix == '4':
+                montant = float(input("Entrez le montant à retirer : "))
+                self.comptes[id_client].retirer(montant)
 
-            elif choice == '5':
-                print("Exiting client menu. Goodbye!")
+            elif choix == '5':
+                print("Sortie du menu client. Au revoir !")
                 break
 
             else:
-                print("Invalid choice. Please enter a valid option.")
+                print("Choix invalide. Veuillez entrer une option valide.")
 
-    def ajouterClient(self, numCl, MPC, numC, SoldeC):
-        self.client_secret[numCl] = MPC
-        self.accounts[numCl] = BankAccount(numCl, SoldeC)
-        self.client_account[numCl] = numC
+    def ajouter_client(self, num_cl, mdp_cl, num_c, solde_c):
+        self.secret_client[num_cl] = mdp_cl
+        self.comptes[num_cl] = CompteBancaire(num_cl, solde_c)
+        self.client_compte[num_cl] = num_c
 
-    def supprimerClient(self, numC):
-        if numC in self.accounts:
-            del self.accounts[numC]
-            for client, account in self.client_account.items():
-                if account == numC:
-                    del self.client_secret[client]
-                    del self.client_account[client]
+    def supprimer_client(self, num_c):
+        if num_c in self.comptes:
+            del self.comptes[num_c]
+            for client, compte in self.client_compte.items():
+                if compte == num_c:
+                    del self.secret_client[client]
+                    del self.client_compte[client]
                     break
-            print(f"Client with account {numC} deleted successfully.")
+            print(f"Client avec le compte {num_c} supprimé avec succès.")
         else:
-            print(f"No account found with number {numC}.")
+            print(f"Aucun compte trouvé avec le numéro {num_c}.")
 
-def modifierMPClient(bank, client_id, new_password):
-    if client_id in bank.client_secret:
-        bank.client_secret[client_id] = new_password
-        print("Password modified successfully.")
-    else:
-        print(f"Client {client_id} not found.")
-
-def deposer(bank, client_id, amount):
-    if client_id in bank.client_account:
-        account_number = bank.client_account[client_id]
-        if account_number in bank.accounts:
-            bank.accounts[account_number].deposit(amount)
+def modifier_mot_de_passe_client(banque, id_client, nouveau_mot_de_passe, old_mdp):
+    if id_client in banque.secret_client:
+        if banque.secret_client[id_client] == old_mdp:
+            banque.secret_client[id_client] = nouveau_mot_de_passe
+            print("Mot de passe modifié avec succès.")
         else:
-            print(f"Account {account_number} not found.")
+            print("Ancien mot de passe incorrect.")
     else:
-        print(f"Client {client_id} not found.")
+        print(f"Client {id_client} non trouvé.")
 
-def retirer(bank, client_id, amount):
-    if client_id in bank.client_account:
-        account_number = bank.client_account[client_id]
-        if account_number in bank.accounts:
-            bank.accounts[account_number].withdraw(amount)
+def deposer(banque, id_client, montant):
+    if id_client in banque.client_compte:
+        numero_compte = banque.client_compte[id_client]
+        if numero_compte in banque.comptes:
+            banque.comptes[numero_compte].deposer(montant)
         else:
-            print(f"Account {account_number} not found.")
+            print(f"Compte {numero_compte} non trouvé.")
     else:
-        print(f"Client {client_id} not found.")
+        print(f"Client {id_client} non trouvé.")
 
+def retirer(banque, id_client, montant):
+    if id_client in banque.client_compte:
+        numero_compte = banque.client_compte[id_client]
+        if numero_compte in banque.comptes:
+            banque.comptes[numero_compte].retirer(montant)
+        else:
+            print(f"Compte {numero_compte} non trouvé.")
+    else:
+        print(f"Client {id_client} non trouvé.")
 
-# generation de numero de compte a partir de numero de client
-genererNumCompte = lambda numCl: int(str(numCl) + str(random.randint(0, 100)))
+generer_numero_compte = lambda num_cl: int(str(num_cl) + str(random.randint(0, 100)))
 
-def EcrireFichierCSV(bank, filename):
-    with open(filename, 'w', newline='') as csvfile:
-        fieldnames = ['Client', 'Code Secret']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+def ecrire_fichier_csv(banque, nom_fichier):
+    with open(nom_fichier, 'w', newline='') as csvfile:
+        noms_champs = ['Client', 'Code Secret']
+        ecrivain = csv.DictWriter(csvfile, fieldnames=noms_champs)
 
-        writer.writeheader()
-        for client, code_secret in bank.client_secret.items():
-            writer.writerow({'Client': client, 'Code Secret': code_secret})
-    print(f"Client information written to {filename}.")
+        ecrivain.writeheader()
+        for client, code_secret in banque.secret_client.items():
+            ecrivain.writerow({'Client': client, 'Code Secret': code_secret})
+    print(f"Informations client écrites dans {nom_fichier}.")
 
-def manipSTS(bank):
-    compte_set = set(bank.client_account.values())
-    compte_list = list(compte_set)
-    compte_tuple = tuple(compte_list)
-    return compte_list, compte_tuple, compte_set
+def manipuler_ensembles_listes_tuples(banque):
+    ensemble_compte = set(banque.client_compte.values())
+    liste_compte = list(ensemble_compte)
+    tuple_compte = tuple(liste_compte)
+    return liste_compte, tuple_compte, ensemble_compte
 
-#La Creation de banque
-bank = Bank()
+# Création de la banque
+banque = Banque()
 
 while True:
-    print("\nMain Menu:")
-    print("1. Bank Agent Menu")
-    print("2. Client Menu")
-    print("3. Quit")
+    print("\nMenu Principal :")
+    print("1. Menu Agent Bancaire")
+    print("2. Menu Client")
+    print("3. Quitter")
 
-    main_choice = input("Enter your choice: ")
+    choix_principal = input("Entrez votre choix : ")
 
-    if main_choice == '1':
-        print("\nBank Agent Menu:")
-        print("1. Add a Client")
-        print("2. Remove a Client")
-        print("3. Display all Clients")
-        print("4. Write to CSV")
-        print("5. Manipulate Sets, Lists, and Tuples")
-        print("6. Quit")
+    if choix_principal == '1':
+        print("\nMenu Agent Bancaire :")
+        print("1. Ajouter un Client")
+        print("2. Supprimer un Client")
+        print("3. Afficher tous les Clients")
+        print("4. Écrire dans un fichier CSV")
+        print("5. Manipuler des ensembles, listes et tuples")
+        print("6. Quitter")
 
-        agent_choice = input("Enter your choice: ")
+        choix_agent = input("Entrez votre choix : ")
 
-        if agent_choice == '1':
-            numCl = int(input("Enter client ID: "))
-            MPC = input("Enter client password: ")
-            numC = genererNumCompte(numCl)
-            SoldeC = float(input("Enter initial balance: "))
-            bank.ajouterClient(numCl, MPC, numC, SoldeC)
+        if choix_agent == '1':
+            num_cl = int(input("Entrez l'ID du client : "))
+            mdp_cl = input("Entrez le mot de passe du client : ")
+            num_c = generer_numero_compte(num_cl)
+            solde_c = float(input("Entrez le solde initial : "))
+            banque.ajouter_client(num_cl, mdp_cl, num_c, solde_c)
 
-        elif agent_choice == '2':
-            numC = int(input("Enter account number to remove: "))
-            bank.supprimerClient(numC)
+        elif choix_agent == '2':
+            num_c = int(input("Entrez le numéro de compte à supprimer : "))
+            banque.supprimer_client(num_c)
 
-        elif agent_choice == '3':
-            print("Clients:")
-            for client, code_secret in bank.client_secret.items():
-                print(f"Client {client}: Code Secret - {code_secret}")
+        elif choix_agent == '3':
+            print("Clients :")
+            for client, code_secret in banque.secret_client.items():
+                print(f"Client {client} : Code Secret - {code_secret}")
 
-        elif agent_choice == '4':
-            filename = input("Enter CSV file name: ")
-            EcrireFichierCSV(bank, filename)
+        elif choix_agent == '4':
+            nom_fichier = input("Entrez le nom du fichier CSV : ")
+            ecrire_fichier_csv(banque, nom_fichier)
 
-        elif agent_choice == '5':
-            compte_list, compte_tuple, compte_set = manipSTS(bank)
-            print(f"List: {compte_list}")
-            print(f"Tuple: {compte_tuple}")
-            print(f"Set: {compte_set}")
+        elif choix_agent == '5':
+            liste_compte, tuple_compte, ensemble_compte = manipuler_ensembles_listes_tuples(banque)
+            print(f"Liste : {liste_compte}")
+            print(f"Tuple : {tuple_compte}")
+            print(f"Ensemble : {ensemble_compte}")
 
-        elif agent_choice == '6':
-            print("Exiting the application. Goodbye!")
+        elif choix_agent == '6':
+            print("Sortie de l'application. Au revoir !")
             break
 
         else:
-            print("Invalid choice. Please enter a valid option.")
+            print("Choix invalide. Veuillez entrer une option valide.")
 
-    elif main_choice == '2':
-        client_id = int(input("Enter your client ID: "))
-        if client_id in bank.client_secret:
-            password = input("Enter your password: ")
-            if password == bank.client_secret[client_id]:
-                bank.client_menu(client_id)
+    elif choix_principal == '2':
+        id_client = int(input("Entrez votre ID client : "))
+        if id_client in banque.secret_client:
+            mot_de_passe = input("Entrez votre mot de passe : ")
+            if mot_de_passe == banque.secret_client[id_client]:
+                banque.menu_client(id_client)
             else:
-                print("Incorrect password. Access denied.")
+                print("Mot de passe incorrect. Accès refusé.")
         else:
-            print("Client not found.")
+            print("Client non trouvé.")
 
-    elif main_choice == '3':
-        print("Exiting the application. Goodbye!")
+    elif choix_principal == '3':
+        print("Au revoir !")
         break
 
     else:
-        print("Invalid choice. Please enter a valid option.")
+        print("Choix invalide. Veuillez entrer une option valide.")
